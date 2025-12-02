@@ -1,171 +1,88 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Monitor de Ônibus</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monitor de Parada</title>
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0a0f24;
-      color: #fff;
-      overflow: hidden;
-    }
-    header {
-      background: #1a2240;
-      padding: 20px;
-      font-size: 32px;
-      font-weight: bold;
-      text-align: center;
-      letter-spacing: 1px;
-    }
-    #container {
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-    .bus-card {
-      background: #141a33;
-      padding: 20px;
-      border-radius: 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 0 10px rgba(0,0,0,0.4);
-      font-size: 26px;
-    }
-    .left {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .line {
-      font-size: 38px;
-      font-weight: bold;
-    }
-    .estimated {
-      font-size: 48px;
-      font-weight: bold;
-      color: #4fc3ff;
-    }
-    footer {
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      text-align: center;
-      padding: 10px;
-      background: #101528;
-      font-size: 20px;
-      opacity: 0.7;
-    }
+    body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 0; }
+    header { background: #007bff; color: #fff; padding: 20px; text-align: center; }
+    main { padding: 20px; }
+    h2 { margin-top: 0; }
+    .info { margin-bottom: 20px; }
+    .bus-list { list-style: none; padding: 0; }
+    .bus-list li { background: #fff; padding: 10px; margin-bottom: 10px; border-radius: 5px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
   </style>
 </head>
 <body>
   <header>
-    PRÓXIMOS ÔNIBUS — <span id="paradaNome">Parada</span>
+    <h1 id="parada-nome">Carregando parada...</h1>
+    <p id="parada-endereco"></p>
+    <p id="parada-coordenadas"></p>
   </header>
+  <main>
+    <h2>Linhas que passam</h2>
+    <ul id="linhas" class="bus-list"></ul>
 
-  <div id="paradaInfo" style="padding:20px; font-size:22px; opacity:0.85;"></div>
-
-  <div id="container">Carregando...</div>
-
-  <footer>Atualizando automaticamente</footer>
+    <h2>Ônibus na parada</h2>
+    <ul id="onibus" class="bus-list"></ul>
+  </main>
 
   <script>
-    const API_URL = "https://esp32-camera-server-pks3.onrender.com/upload/list";
-
-    // Dados fixos das paradas
-    const PARADAS = {
-      "TI Caxangá": {
-        endereco: "Av. Caxangá, Terminal Integrado",
-        coords: "-8.036647, -34.954203",
-        linhas: "437, 2441, 2450, 2444"
-      },
-      "BRT Engenho Poeta": {
-        endereco: "Av. Caxangá, próximo à Rua Rodrigues Ferreira",
-        coords: "-8.036329, -34.945890",
-        linhas: "437, 2441, 2450, 2444"
-      },
-      "BRT Caiara": {
-        endereco: "Av. Caxangá, próximo à Av. Maurício de Nassau",
-        coords: "-8.040180, -34.937666",
-        linhas: "437, 2441, 2450, 2444"
-      },
-      "BRT Parque do Cordeiro": {
-        endereco: "Av. Caxangá, próximo à Rua Cláudio Brotherhood",
-        coords: "-8.046522, -34.928813",
-        linhas: "437, 2441, 2450, 2444"
-      },
-      "BRT Getúlio Vargas": {
-        endereco: "Próx. ao TI Getúlio Vargas",
-        coords: "-8.050529, -34.921381",
-        linhas: "437, 2441, 2450, 2444"
-      },
-      "BRT Derby": {
-        endereco: "Praça do Derby / Ponte Estácio Coimbra",
-        coords: "-8.058319, -34.904250",
-        linhas: "437, 2441, 2450, 2444"
-      },
-      "BRT Hospedaria": {
-        endereco: "Av. Conde da Boa Vista",
-        coords: "-8.060126, -34.896791",
-        linhas: "437, 2441, 2450, 2444"
-      },
-      "BRT Shopping Boa Vista": {
-        endereco: "Av. Conde da Boa Vista (Shopping)",
-        coords: "-8.061989, -34.891395",
-        linhas: "437, 2441, 2450, 2444"
-      }
+    // Configuração das paradas
+    const paradas = {
+      caxanga: { nome: "TI Caxangá", endereco: "Av. Caxangá, Caxangá", coordenadas: "-8.045, -34.923", linhas: ["101", "102", "103"] },
+      poeta: { nome: "BRT Engenho Poeta", endereco: "Av. Caxangá", coordenadas: "-8.050, -34.920", linhas: ["201", "202"] },
+      caiara: { nome: "BRT Caiara", endereco: "Av. Caxangá", coordenadas: "-8.055, -34.915", linhas: ["301", "302"] },
+      cordeiro: { nome: "BRT Parque do Cordeiro", endereco: "Av. Caxangá", coordenadas: "-8.060, -34.910", linhas: ["401", "402"] },
+      getulio: { nome: "BRT Getúlio Vargas", endereco: "Av. Caxangá", coordenadas: "-8.065, -34.905", linhas: ["501", "502"] },
+      derby: { nome: "BRT Derby", endereco: "Praça do Derby", coordenadas: "-8.070, -34.900", linhas: ["601", "602"] },
+      hospedaria: { nome: "BRT Hospedaria", endereco: "Av. Conde da Boa Vista", coordenadas: "-8.075, -34.895", linhas: ["701", "702"] },
+      "boa-vista": { nome: "BRT Shopping Boa Vista", endereco: "Av. Conde da Boa Vista", coordenadas: "-8.080, -34.890", linhas: ["801", "802"] }
     };
 
-    // Escolha da parada ativa
-    const PARADA_ATIVA = "BRT Engenho Poeta"; // ajuste aqui
+    // Lê o ID da parada da URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const paradaID = urlParams.get('parada');
 
-    function carregarParada() {
-      const p = PARADAS[PARADA_ATIVA];
-      document.getElementById("paradaNome").innerText = PARADA_ATIVA;
-      document.getElementById("paradaInfo").innerHTML = `
-        <strong>Endereço:</strong> ${p.endereco}<br>
-        <strong>Coordenadas:</strong> ${p.coords}<br>
-        <strong>Linhas:</strong> ${p.linhas}
-      `;
-    }
+    if (!paradaID || !paradas[paradaID]) {
+      document.getElementById('parada-nome').textContent = "Parada não encontrada";
+    } else {
+      const parada = paradas[paradaID];
+      document.getElementById('parada-nome').textContent = parada.nome;
+      document.getElementById('parada-endereco').textContent = parada.endereco;
+      document.getElementById('parada-coordenadas').textContent = `Coordenadas: ${parada.coordenadas}`;
 
-    carregarParada();
+      // Exibe linhas
+      const linhasList = document.getElementById('linhas');
+      parada.linhas.forEach(linha => {
+        const li = document.createElement('li');
+        li.textContent = `Linha ${linha}`;
+        linhasList.appendChild(li);
+      });
 
-    async function buscarOnibus() {
-      try {
-        const res = await fetch(API_URL);
-        const data = await res.json();
-
-        // Mock de tempos para exibição na parada
-        const container = document.getElementById("container");
-        container.innerHTML = "";
-
-        data.slice(0, 5).forEach((item, i) => {
-          const minutos = Math.floor(Math.random() * 12) + 1;
-
-          const div = document.createElement("div");
-          div.className = "bus-card";
-          div.innerHTML = `
-            <div class="left">
-              <div class="line">Linha ${100 + i}</div>
-              <div>${item.origem} → ${item.destino}</div>
-            </div>
-            <div class="estimated">${minutos} min</div>
-          `;
-
-          container.appendChild(div);
+      // Busca ônibus da parada no backend
+      fetch('https://seu-backend.net/upload/list')
+        .then(res => res.json())
+        .then(data => {
+          const onibusList = document.getElementById('onibus');
+          // Filtra apenas os ônibus dessa parada
+          const onibusParada = data.filter(o => o.parada === paradaID);
+          if (onibusParada.length === 0) {
+            onibusList.innerHTML = "<li>Nenhum ônibus no momento</li>";
+          } else {
+            onibusParada.forEach(bus => {
+              const li = document.createElement('li');
+              li.textContent = `Ônibus ${bus.linha} - ${bus.status || "A caminho"}`;
+              onibusList.appendChild(li);
+            });
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          document.getElementById('onibus').innerHTML = "<li>Erro ao carregar ônibus</li>";
         });
-      } catch (e) {
-        document.getElementById("container").innerHTML = "Erro ao carregar dados";
-      }
     }
-
-    buscarOnibus();
-    setInterval(buscarOnibus, 8000);
   </script>
 </body>
 </html>
