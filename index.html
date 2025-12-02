@@ -3,15 +3,76 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Monitor de Parada</title>
+  <title>Monitor de Parada - PE</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 0; }
-    header { background: #007bff; color: #fff; padding: 20px; text-align: center; }
-    main { padding: 20px; }
-    h2 { margin-top: 0; }
-    .info { margin-bottom: 20px; }
-    .bus-list { list-style: none; padding: 0; }
-    .bus-list li { background: #fff; padding: 10px; margin-bottom: 10px; border-radius: 5px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
+    /* Cores de Pernambuco */
+    :root {
+      --azul-pe: #00247d;
+      --vermelho-pe: #d80027;
+      --amarelo-pe: #ffcd00;
+      --branco: #ffffff;
+      --cinza-claro: #f5f5f5;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: var(--cinza-claro);
+      color: #333;
+    }
+
+    header {
+      background: var(--azul-pe);
+      color: var(--branco);
+      text-align: center;
+      padding: 20px 10px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2em;
+    }
+
+    header p {
+      margin: 5px 0;
+      font-size: 1em;
+    }
+
+    main {
+      padding: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    h2 {
+      margin-top: 30px;
+      color: var(--azul-pe);
+    }
+
+    ul.bus-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    ul.bus-list li {
+      background: var(--branco);
+      padding: 15px 20px;
+      margin-bottom: 12px;
+      border-left: 8px solid var(--azul-pe);
+      border-radius: 5px;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Cores de status do ônibus */
+    .status-a-caminho { border-left-color: #28a745; }  /* verde */
+    .status-atrasado { border-left-color: #ffc107; }   /* amarelo */
+    .status-parado { border-left-color: #dc3545; }     /* vermelho */
   </style>
 </head>
 <body>
@@ -65,7 +126,7 @@
           .then(res => res.json())
           .then(data => {
             const onibusList = document.getElementById('onibus');
-            onibusList.innerHTML = ""; // Limpa lista antes de atualizar
+            onibusList.innerHTML = "";
 
             const onibusParada = data.filter(o => o.parada === paradaID);
             if (onibusParada.length === 0) {
@@ -73,7 +134,11 @@
             } else {
               onibusParada.forEach(bus => {
                 const li = document.createElement('li');
-                li.textContent = `Ônibus ${bus.linha} - ${bus.status || "A caminho"}`;
+                li.textContent = `Ônibus ${bus.linha}`;
+                // Define classe de status
+                if(bus.status === "A caminho") li.classList.add('status-a-caminho');
+                else if(bus.status === "Atrasado") li.classList.add('status-atrasado');
+                else li.classList.add('status-parado');
                 onibusList.appendChild(li);
               });
             }
@@ -84,9 +149,7 @@
           });
       }
 
-      // Atualiza ao carregar a página
       atualizarOnibus();
-      // Atualiza a cada 10 segundos
       setInterval(atualizarOnibus, 10000);
     }
   </script>
