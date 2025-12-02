@@ -29,7 +29,6 @@
   </main>
 
   <script>
-    // Configuração das paradas
     const paradas = {
       caxanga: { nome: "TI Caxangá", endereco: "Av. Caxangá, Caxangá", coordenadas: "-8.045, -34.923", linhas: ["101", "102", "103"] },
       poeta: { nome: "BRT Engenho Poeta", endereco: "Av. Caxangá", coordenadas: "-8.050, -34.920", linhas: ["201", "202"] },
@@ -41,7 +40,6 @@
       "boa-vista": { nome: "BRT Shopping Boa Vista", endereco: "Av. Conde da Boa Vista", coordenadas: "-8.080, -34.890", linhas: ["801", "802"] }
     };
 
-    // Lê o ID da parada da URL
     const urlParams = new URLSearchParams(window.location.search);
     const paradaID = urlParams.get('parada');
 
@@ -61,27 +59,35 @@
         linhasList.appendChild(li);
       });
 
-      // Busca ônibus da parada no backend
-      fetch('https://seu-backend.net/upload/list')
-        .then(res => res.json())
-        .then(data => {
-          const onibusList = document.getElementById('onibus');
-          // Filtra apenas os ônibus dessa parada
-          const onibusParada = data.filter(o => o.parada === paradaID);
-          if (onibusParada.length === 0) {
-            onibusList.innerHTML = "<li>Nenhum ônibus no momento</li>";
-          } else {
-            onibusParada.forEach(bus => {
-              const li = document.createElement('li');
-              li.textContent = `Ônibus ${bus.linha} - ${bus.status || "A caminho"}`;
-              onibusList.appendChild(li);
-            });
-          }
-        })
-        .catch(err => {
-          console.error(err);
-          document.getElementById('onibus').innerHTML = "<li>Erro ao carregar ônibus</li>";
-        });
+      // Função para atualizar ônibus
+      function atualizarOnibus() {
+        fetch('https://seu-backend.net/upload/list')
+          .then(res => res.json())
+          .then(data => {
+            const onibusList = document.getElementById('onibus');
+            onibusList.innerHTML = ""; // Limpa lista antes de atualizar
+
+            const onibusParada = data.filter(o => o.parada === paradaID);
+            if (onibusParada.length === 0) {
+              onibusList.innerHTML = "<li>Nenhum ônibus no momento</li>";
+            } else {
+              onibusParada.forEach(bus => {
+                const li = document.createElement('li');
+                li.textContent = `Ônibus ${bus.linha} - ${bus.status || "A caminho"}`;
+                onibusList.appendChild(li);
+              });
+            }
+          })
+          .catch(err => {
+            console.error(err);
+            document.getElementById('onibus').innerHTML = "<li>Erro ao carregar ônibus</li>";
+          });
+      }
+
+      // Atualiza ao carregar a página
+      atualizarOnibus();
+      // Atualiza a cada 10 segundos
+      setInterval(atualizarOnibus, 10000);
     }
   </script>
 </body>
