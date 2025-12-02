@@ -79,7 +79,6 @@
   <header>
     <h1 id="parada-nome">Carregando parada...</h1>
     <p id="parada-endereco"></p>
-    <p id="parada-coordenadas"></p>
   </header>
   <main>
     <h2>Linhas que passam</h2>
@@ -91,14 +90,14 @@
 
   <script>
     const paradas = {
-      caxanga: { nome: "TI Caxangá", endereco: "Av. Caxangá, Caxangá", coordenadas: "-8.045, -34.923", linhas: ["101", "102", "103"] },
-      poeta: { nome: "BRT Engenho Poeta", endereco: "Av. Caxangá", coordenadas: "-8.050, -34.920", linhas: ["201", "202"] },
-      caiara: { nome: "BRT Caiara", endereco: "Av. Caxangá", coordenadas: "-8.055, -34.915", linhas: ["301", "302"] },
-      cordeiro: { nome: "BRT Parque do Cordeiro", endereco: "Av. Caxangá", coordenadas: "-8.060, -34.910", linhas: ["401", "402"] },
-      getulio: { nome: "BRT Getúlio Vargas", endereco: "Av. Caxangá", coordenadas: "-8.065, -34.905", linhas: ["501", "502"] },
-      derby: { nome: "BRT Derby", endereco: "Praça do Derby", coordenadas: "-8.070, -34.900", linhas: ["601", "602"] },
-      hospedaria: { nome: "BRT Hospedaria", endereco: "Av. Conde da Boa Vista", coordenadas: "-8.075, -34.895", linhas: ["701", "702"] },
-      "boa-vista": { nome: "BRT Shopping Boa Vista", endereco: "Av. Conde da Boa Vista", coordenadas: "-8.080, -34.890", linhas: ["801", "802"] }
+      caxanga: { nome: "TI Caxangá", endereco: "Av. Caxangá, Caxangá", linhas: ["101", "102", "103"] },
+      poeta: { nome: "BRT Engenho Poeta", endereco: "Av. Caxangá", linhas: ["201", "202"] },
+      caiara: { nome: "BRT Caiara", endereco: "Av. Caxangá", linhas: ["301", "302"] },
+      cordeiro: { nome: "BRT Parque do Cordeiro", endereco: "Av. Caxangá", linhas: ["401", "402"] },
+      getulio: { nome: "BRT Getúlio Vargas", endereco: "Av. Caxangá", linhas: ["501", "502"] },
+      derby: { nome: "BRT Derby", endereco: "Praça do Derby", linhas: ["601", "602"] },
+      hospedaria: { nome: "BRT Hospedaria", endereco: "Av. Conde da Boa Vista", linhas: ["701", "702"] },
+      "boa-vista": { nome: "BRT Shopping Boa Vista", endereco: "Av. Conde da Boa Vista", linhas: ["801", "802"] }
     };
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -110,7 +109,6 @@
       const parada = paradas[paradaID];
       document.getElementById('parada-nome').textContent = parada.nome;
       document.getElementById('parada-endereco').textContent = parada.endereco;
-      document.getElementById('parada-coordenadas').textContent = `Coordenadas: ${parada.coordenadas}`;
 
       // Exibe linhas
       const linhasList = document.getElementById('linhas');
