@@ -63,14 +63,77 @@
   </style>
 </head>
 <body>
-  <header>PRÓXIMOS ÔNIBUS</header>
+  <header>
+    PRÓXIMOS ÔNIBUS — <span id="paradaNome">Parada</span>
+  </header>
+
+  <div id="paradaInfo" style="padding:20px; font-size:22px; opacity:0.85;"></div>
 
   <div id="container">Carregando...</div>
 
   <footer>Atualizando automaticamente</footer>
 
   <script>
-    const API_URL = "https://esp32-camera-server-pks3.onrender.com/upload/list;
+    const API_URL = "https://esp32-camera-server-pks3.onrender.com/upload/list";
+
+    // Dados fixos das paradas
+    const PARADAS = {
+      "TI Caxangá": {
+        endereco: "Av. Caxangá, Terminal Integrado",
+        coords: "-8.036647, -34.954203",
+        linhas: "437, 2441, 2450, 2444"
+      },
+      "BRT Engenho Poeta": {
+        endereco: "Av. Caxangá, próximo à Rua Rodrigues Ferreira",
+        coords: "-8.036329, -34.945890",
+        linhas: "437, 2441, 2450, 2444"
+      },
+      "BRT Caiara": {
+        endereco: "Av. Caxangá, próximo à Av. Maurício de Nassau",
+        coords: "-8.040180, -34.937666",
+        linhas: "437, 2441, 2450, 2444"
+      },
+      "BRT Parque do Cordeiro": {
+        endereco: "Av. Caxangá, próximo à Rua Cláudio Brotherhood",
+        coords: "-8.046522, -34.928813",
+        linhas: "437, 2441, 2450, 2444"
+      },
+      "BRT Getúlio Vargas": {
+        endereco: "Próx. ao TI Getúlio Vargas",
+        coords: "-8.050529, -34.921381",
+        linhas: "437, 2441, 2450, 2444"
+      },
+      "BRT Derby": {
+        endereco: "Praça do Derby / Ponte Estácio Coimbra",
+        coords: "-8.058319, -34.904250",
+        linhas: "437, 2441, 2450, 2444"
+      },
+      "BRT Hospedaria": {
+        endereco: "Av. Conde da Boa Vista",
+        coords: "-8.060126, -34.896791",
+        linhas: "437, 2441, 2450, 2444"
+      },
+      "BRT Shopping Boa Vista": {
+        endereco: "Av. Conde da Boa Vista (Shopping)",
+        coords: "-8.061989, -34.891395",
+        linhas: "437, 2441, 2450, 2444"
+      }
+    };
+
+    // Escolha da parada ativa
+    const PARADA_ATIVA = "BRT Engenho Poeta"; // ajuste aqui
+
+    function carregarParada() {
+      const p = PARADAS[PARADA_ATIVA];
+      document.getElementById("paradaNome").innerText = PARADA_ATIVA;
+      document.getElementById("paradaInfo").innerHTML = `
+        <strong>Endereço:</strong> ${p.endereco}<br>
+        <strong>Coordenadas:</strong> ${p.coords}<br>
+        <strong>Linhas:</strong> ${p.linhas}
+      `;
+    }
+
+    carregarParada();
 
     async function buscarOnibus() {
       try {
