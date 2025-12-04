@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="refresh" content="10">
-    <title>BRT Recife - Próximos Ônibus</title>
+    <title>BRT Recife - Monitor em Tempo Real</title>
     <style>
         * {
             margin: 0;
@@ -14,7 +13,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            background: linear-gradient(135deg, #0047AB 0%, #003380 50%, #CC092F 100%);
             color: #fff;
             min-height: 100vh;
             padding: 20px;
@@ -22,7 +21,7 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
         }
 
@@ -32,40 +31,91 @@
             animation: fadeInDown 0.8s ease;
         }
 
+        .flag-banner {
+            width: 120px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: linear-gradient(to bottom, 
+                #0047AB 0%, #0047AB 33%, 
+                white 33%, white 66%, 
+                #CC092F 66%, #CC092F 100%);
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
         h1 {
             font-size: 3em;
             font-weight: 700;
-            color: #FFD700;
+            color: white;
             text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
             margin-bottom: 10px;
         }
 
         .subtitulo {
             font-size: 1.3em;
-            color: #fff;
+            color: #FFD700;
             opacity: 0.9;
+            font-weight: 600;
         }
 
         .info-bar {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
             padding: 15px 30px;
             border-radius: 15px;
             margin-bottom: 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border-left: 6px solid #CC092F;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         .info-item {
             display: flex;
             align-items: center;
             gap: 10px;
+            color: #0047AB;
+            font-weight: 600;
         }
 
         .info-icon {
             font-size: 1.5em;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .card.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #0047AB;
+        }
+
+        .card-title {
+            color: #0047AB;
+            font-size: 1.5em;
+            font-weight: 600;
         }
 
         #previsoes {
@@ -74,22 +124,20 @@
         }
 
         .onibus {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
+            background: linear-gradient(135deg, rgba(0, 71, 171, 0.05), rgba(255, 255, 255, 0.05));
             padding: 25px 30px;
-            border-radius: 20px;
-            border-left: 8px solid #4CAF50;
+            border-radius: 15px;
+            border-left: 8px solid #0047AB;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
             transition: all 0.3s ease;
             animation: slideIn 0.5s ease;
         }
 
         .onibus:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 71, 171, 0.2);
         }
 
         .onibus-info {
@@ -97,17 +145,18 @@
         }
 
         .linha {
-            font-size: 3em;
+            font-size: 2.5em;
             font-weight: 900;
-            color: #4CAF50;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            color: #0047AB;
+            text-shadow: 2px 2px 4px rgba(0, 71, 171, 0.1);
             margin-bottom: 5px;
         }
 
         .nome-linha {
-            font-size: 1.2em;
-            color: #fff;
-            opacity: 0.9;
+            font-size: 1em;
+            color: #003380;
+            opacity: 0.8;
+            font-weight: 500;
         }
 
         .tempo-container {
@@ -115,55 +164,42 @@
         }
 
         .tempo {
-            font-size: 4em;
+            font-size: 3.5em;
             font-weight: 900;
-            color: #FFD700;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            color: #CC092F;
+            text-shadow: 2px 2px 4px rgba(204, 9, 47, 0.1);
             line-height: 1;
         }
 
         .tempo-label {
-            font-size: 1.1em;
-            color: #fff;
+            font-size: 1em;
+            color: #0047AB;
             opacity: 0.8;
             margin-top: 5px;
+            font-weight: 600;
         }
 
         .chegando {
-            border-left-color: #FF5722;
+            border-left-color: #CC092F;
+            background: linear-gradient(135deg, rgba(204, 9, 47, 0.1), rgba(255, 255, 255, 0.05));
         }
 
-        .chegando .linha {
-            color: #FF5722;
+        .chegando .linha, .chegando .tempo {
             animation: pulse 1.5s infinite;
         }
 
-        .chegando .tempo {
-            color: #FF5722;
-        }
-
-        .vazio {
+        .vazio, .loading, .erro {
             text-align: center;
-            padding: 60px 30px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            font-size: 1.5em;
-            color: rgba(255, 255, 255, 0.6);
+            padding: 40px 30px;
+            border-radius: 15px;
+            border-left: 6px solid #CC092F;
+            color: #0047AB;
         }
 
         .vazio-icon {
-            font-size: 4em;
-            margin-bottom: 20px;
+            font-size: 3em;
+            margin-bottom: 15px;
             opacity: 0.5;
-        }
-
-        .atualizado {
-            text-align: center;
-            margin-top: 30px;
-            padding: 15px;
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.95em;
         }
 
         .status-dot {
@@ -176,25 +212,13 @@
             margin-right: 8px;
         }
 
-        .erro {
-            background: rgba(255, 87, 34, 0.2);
-            border-left-color: #FF5722;
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 40px;
-            font-size: 1.3em;
-            color: rgba(255, 255, 255, 0.7);
+        .status-offline {
+            background: #CC092F;
         }
 
         .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.2);
-            border-top: 4px solid #FFD700;
+            border: 4px solid rgba(0, 71, 171, 0.2);
+            border-top: 4px solid #CC092F;
             border-radius: 50%;
             width: 50px;
             height: 50px;
@@ -202,44 +226,112 @@
             margin: 20px auto;
         }
 
+        .upload-area {
+            border: 3px dashed #0047AB;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(0, 71, 171, 0.05);
+        }
+
+        .upload-area:hover {
+            border-color: #CC092F;
+            background: rgba(204, 9, 47, 0.05);
+        }
+
+        .upload-area.dragover {
+            background: rgba(0, 71, 171, 0.1);
+            border-color: #CC092F;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px 5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0047AB, #003380);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(0, 71, 171, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #CC092F, #A00725);
+            color: white;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(0, 71, 171, 0.05), rgba(204, 9, 47, 0.05));
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border-left: 4px solid #0047AB;
+        }
+
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: 900;
+            color: #CC092F;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #0047AB;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
         @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
         }
 
         @keyframes pulse {
-            0%, 100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.6;
-            }
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
         }
 
         @keyframes blink {
-            0%, 100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.3;
-            }
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
         }
 
         @keyframes spin {
@@ -248,23 +340,21 @@
         }
 
         @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
             h1 {
                 font-size: 2em;
             }
 
-            .onibus {
-                flex-direction: column;
-                text-align: center;
-                gap: 15px;
-            }
-
-            .tempo-container {
-                text-align: center;
-            }
-
-            .info-bar {
-                flex-direction: column;
-                gap: 15px;
+            .flag-banner {
+                width: 80px;
+                height: 53px;
             }
         }
     </style>
@@ -272,18 +362,19 @@
 <body>
     <div class="container">
         <header>
-            <h1> Próximos Ônibus</h1>
-            <p class="subtitulo">Conde da Boa Vista - BRT Recife</p>
+            <div class="flag-banner"></div>
+            <h1>🚍 BRT Recife - Monitor em Tempo Real</h1>
+            <p class="subtitulo">Sistema de Detecção e Previsão de Ônibus</p>
         </header>
 
         <div class="info-bar">
             <div class="info-item">
-                <span class="info-icon">🚏</span>
-                <span>Parada B</span>
+                <span class="info-icon">📡</span>
+                <span>Servidor: <span id="servidor-status">Verificando...</span></span>
             </div>
             <div class="info-item">
-                <span class="status-dot"></span>
-                <span>Sistema Online</span>
+                <span class="status-dot" id="status-dot"></span>
+                <span id="conexao-status">Conectando...</span>
             </div>
             <div class="info-item">
                 <span class="info-icon">⏱️</span>
@@ -291,16 +382,73 @@
             </div>
         </div>
 
-        <div id="previsoes">
-            <div class="loading">
-                <div class="spinner"></div>
-                <p>Carregando previsões...</p>
-            </div>
-        </div>
+        <div class="main-grid">
+            <!-- Upload de Imagem -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">📤 Upload de Imagem</div>
+                </div>
+                
+                <div class="upload-area" id="uploadArea">
+                    <div style="font-size: 3em; margin-bottom: 15px;">📸</div>
+                    <h3 style="color: #0047AB; margin-bottom: 10px;">Clique ou arraste uma imagem</h3>
+                    <p style="color: #666; font-size: 0.9em;">Envie uma foto de ônibus para detecção</p>
+                </div>
+                
+                <input type="file" id="fileInput" accept="image/*" />
+                
+                <div id="preview-container" style="display: none; text-align: center;">
+                    <img id="preview" class="preview-image" />
+                    <div>
+                        <button class="btn btn-primary" onclick="enviarImagem()">🚀 Enviar para Análise</button>
+                        <button class="btn btn-danger" onclick="cancelarUpload()">❌ Cancelar</button>
+                    </div>
+                </div>
 
-        <div class="atualizado" id="atualizado">
-            <span class="info-icon">🔄</span>
-            Atualizado: --
+                <div id="upload-resultado" style="margin-top: 20px;"></div>
+            </div>
+
+            <!-- Estatísticas -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">📊 Estatísticas</div>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-deteccoes">0</div>
+                        <div class="stat-label">Detecções</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="ultimo-tempo">--</div>
+                        <div class="stat-label">Último Tempo</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="ultima-linha">--</div>
+                        <div class="stat-label">Última Linha</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 25px; text-align: center;">
+                    <button class="btn btn-primary" onclick="buscarUltimas()">🔄 Atualizar Dados</button>
+                    <button class="btn btn-danger" onclick="limparDados()">🗑️ Limpar Histórico</button>
+                </div>
+            </div>
+
+            <!-- Últimas Detecções -->
+            <div class="card full-width">
+                <div class="card-header">
+                    <div class="card-title">🎯 Últimas Detecções</div>
+                    <button class="btn btn-primary" onclick="buscarUltimas()">🔄 Atualizar</button>
+                </div>
+                
+                <div id="previsoes">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Carregando detecções...</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -308,104 +456,210 @@
         // ===========================
         // CONFIGURAÇÕES
         // ===========================
+        const SERVIDOR_URL = 'https://brt-webcam-server.onrender.com';
         
-        // IMPORTANTE: Trocar pela URL do seu servidor Render!
-        const SERVIDOR_URL = 'https://esp32-camera-server-pks3.onrender.com';
-        // Exemplo: https://brt-recife-api.onrender.com
-        
-        const PARADA_ID = 'B';
-        const INTERVALO_ATUALIZACAO = 10000; // 10 segundos
+        let imagemSelecionada = null;
 
-        // Nomes completos das linhas (suas linhas reais!)
-        const LINHAS_INFO = {
-            '437': 'TI Caxangá',
-            '2441': 'TI CDU',
-            '2450': 'TI Camaragibe',
-            '2444': 'TI Getúlio Vargas'
+        // ===========================
+        // INICIALIZAÇÃO
+        // ===========================
+        
+        window.onload = () => {
+            atualizarHora();
+            setInterval(atualizarHora, 1000);
+            verificarServidor();
+            buscarUltimas();
+            setInterval(buscarUltimas, 15000); // Atualiza a cada 15 segundos
         };
 
         // ===========================
-        // FUNÇÕES
+        // FUNÇÕES DE HORA E STATUS
         // ===========================
 
         function atualizarHora() {
             const agora = new Date();
             const hora = agora.toLocaleTimeString('pt-BR', {
                 hour: '2-digit',
-                minute: '2-digit'
+                minute: '2-digit',
+                second: '2-digit'
             });
             document.getElementById('hora-atual').textContent = hora;
         }
 
-        async function buscarPrevisoes() {
+        async function verificarServidor() {
             try {
-                console.log('Buscando previsões...');
-                
-                const response = await fetch(`${SERVIDOR_URL}/previsoes/${PARADA_ID}`);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
+                const response = await fetch(`${SERVIDOR_URL}/health`);
+                if (response.ok) {
+                    document.getElementById('servidor-status').textContent = 'Online ✅';
+                    document.getElementById('conexao-status').textContent = 'Conectado';
+                    document.getElementById('status-dot').classList.remove('status-offline');
+                } else {
+                    throw new Error('Servidor offline');
                 }
-                
+            } catch (error) {
+                document.getElementById('servidor-status').textContent = 'Offline ❌';
+                document.getElementById('conexao-status').textContent = 'Desconectado';
+                document.getElementById('status-dot').classList.add('status-offline');
+            }
+        }
+
+        // ===========================
+        // UPLOAD DE IMAGEM
+        // ===========================
+
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const previewContainer = document.getElementById('preview-container');
+        const preview = document.getElementById('preview');
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                handleFile(file);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        });
+
+        function handleFile(file) {
+            imagemSelecionada = file;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                preview.src = e.target.result;
+                uploadArea.style.display = 'none';
+                previewContainer.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function cancelarUpload() {
+            imagemSelecionada = null;
+            fileInput.value = '';
+            uploadArea.style.display = 'block';
+            previewContainer.style.display = 'none';
+            document.getElementById('upload-resultado').innerHTML = '';
+        }
+
+        async function enviarImagem() {
+            if (!imagemSelecionada) return;
+
+            const resultadoDiv = document.getElementById('upload-resultado');
+            resultadoDiv.innerHTML = '<div class="loading"><div class="spinner"></div><p>Processando imagem...</p></div>';
+
+            const formData = new FormData();
+            formData.append('imagem', imagemSelecionada);
+
+            try {
+                const response = await fetch(`${SERVIDOR_URL}/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+
                 const data = await response.json();
-                console.log('Dados recebidos:', data);
+
+                if (data.status === 'ok') {
+                    const tempo = data.previsao ? `${data.previsao.chega_em_min} min` : '--';
+                    resultadoDiv.innerHTML = `
+                        <div style="background: rgba(40, 167, 69, 0.1); padding: 20px; border-radius: 10px; border-left: 4px solid #28a745;">
+                            <h3 style="color: #28a745; margin-bottom: 10px;">✅ Detecção realizada!</h3>
+                            <p style="color: #0047AB;"><strong>Linha:</strong> ${data.linha || 'Não detectada'}</p>
+                            <p style="color: #0047AB;"><strong>Previsão:</strong> ${tempo}</p>
+                        </div>
+                    `;
+                    buscarUltimas(); // Atualiza a lista
+                } else {
+                    throw new Error('Erro no processamento');
+                }
+            } catch (error) {
+                resultadoDiv.innerHTML = `
+                    <div style="background: rgba(204, 9, 47, 0.1); padding: 20px; border-radius: 10px; border-left: 4px solid #CC092F;">
+                        <h3 style="color: #CC092F; margin-bottom: 10px;">❌ Erro ao processar</h3>
+                        <p style="color: #666;">${error.message}</p>
+                    </div>
+                `;
+            }
+
+            setTimeout(cancelarUpload, 5000);
+        }
+
+        // ===========================
+        // BUSCAR ÚLTIMAS DETECÇÕES
+        // ===========================
+
+        async function buscarUltimas() {
+            try {
+                const response = await fetch(`${SERVIDOR_URL}/ultimos`);
+                const data = await response.json();
                 
-                exibirPrevisoes(data);
+                exibirDeteccoes(data);
+                atualizarEstatisticas(data);
                 
             } catch (error) {
-                console.error('Erro ao buscar previsões:', error);
+                console.error('Erro ao buscar detecções:', error);
                 exibirErro(error.message);
             }
         }
 
-        function exibirPrevisoes(data) {
+        function exibirDeteccoes(data) {
             const container = document.getElementById('previsoes');
-            container.innerHTML = '';
-
-            const atualizado = document.getElementById('atualizado');
-            atualizado.innerHTML = `
-                <span class="info-icon">🔄</span>
-                Atualizado: ${data.atualizado_em || 'agora'}
-            `;
-
-            if (!data.previsoes || data.previsoes.length === 0) {
+            
+            if (!data || data.length === 0) {
                 container.innerHTML = `
                     <div class="vazio">
                         <div class="vazio-icon">🚌</div>
-                        <p>Nenhum ônibus em rota no momento</p>
+                        <p>Nenhuma detecção registrada ainda</p>
                         <p style="font-size: 0.8em; margin-top: 10px; opacity: 0.6;">
-                            Aguarde as próximas detecções
+                            Envie uma imagem de ônibus para começar
                         </p>
                     </div>
                 `;
                 return;
             }
 
-            // Renderizar cada previsão
-            data.previsoes.forEach((prev, index) => {
+            container.innerHTML = '';
+
+            data.forEach((item, index) => {
                 const div = document.createElement('div');
                 div.className = 'onibus';
                 
-                // Adicionar classe especial se está chegando
-                if (prev.minutos <= 1) {
+                const tempo = item.previsao ? item.previsao.chega_em_min : '--';
+                const linha = item.linha_detectada || 'Não detectada';
+                
+                if (tempo !== '--' && tempo <= 2) {
                     div.classList.add('chegando');
                 }
 
-                // Delay de animação para efeito cascata
                 div.style.animationDelay = `${index * 0.1}s`;
 
-                // Obter nome completo da linha
-                const nomeLinha = LINHAS_INFO[prev.linha] || prev.nome || 'Linha desconhecida';
+                const timestamp = new Date(item.timestamp).toLocaleString('pt-BR');
 
                 div.innerHTML = `
                     <div class="onibus-info">
-                        <div class="linha">${prev.linha}</div>
-                        <div class="nome-linha">${nomeLinha}</div>
+                        <div class="linha">${linha}</div>
+                        <div class="nome-linha">${timestamp}</div>
                     </div>
                     <div class="tempo-container">
-                        <div class="tempo">${prev.minutos}</div>
+                        <div class="tempo">${tempo !== '--' ? tempo : '?'}</div>
                         <div class="tempo-label">
-                            ${prev.minutos === 1 ? 'minuto' : 'minutos'}
+                            ${tempo === 1 ? 'minuto' : 'minutos'}
                         </div>
                     </div>
                 `;
@@ -414,63 +668,53 @@
             });
         }
 
+        function atualizarEstatisticas(data) {
+            const total = data.length;
+            document.getElementById('total-deteccoes').textContent = total;
+
+            if (data.length > 0) {
+                const ultimo = data[0];
+                const tempo = ultimo.previsao ? `${ultimo.previsao.chega_em_min}m` : '--';
+                const linha = ultimo.linha_detectada || '--';
+                
+                document.getElementById('ultimo-tempo').textContent = tempo;
+                document.getElementById('ultima-linha').textContent = linha;
+            }
+        }
+
         function exibirErro(mensagem) {
             const container = document.getElementById('previsoes');
             container.innerHTML = `
                 <div class="erro">
                     <div style="font-size: 3em; margin-bottom: 15px;">⚠️</div>
-                    <h3 style="margin-bottom: 10px;">Erro ao conectar com servidor</h3>
+                    <h3 style="margin-bottom: 10px;">Erro ao buscar dados</h3>
                     <p style="opacity: 0.8;">${mensagem}</p>
-                    <p style="font-size: 0.9em; margin-top: 15px; opacity: 0.6;">
-                        Tentando reconectar automaticamente...
-                    </p>
                 </div>
             `;
         }
 
-        function verificarConexao() {
-            if (SERVIDOR_URL.includes('SEU-APP')) {
-                const container = document.getElementById('previsoes');
-                container.innerHTML = `
-                    <div class="erro">
-                        <div style="font-size: 3em; margin-bottom: 15px;">⚙️</div>
-                        <h3 style="margin-bottom: 10px;">Configuração Necessária</h3>
-                        <p style="opacity: 0.8;">
-                            Por favor, atualize a variável <code style="background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 4px;">SERVIDOR_URL</code> 
-                            no código HTML com a URL do seu servidor Render.
-                        </p>
-                        <p style="font-size: 0.9em; margin-top: 15px; opacity: 0.6;">
-                            Exemplo: https://brt-recife-api.onrender.com
-                        </p>
-                    </div>
-                `;
-                return false;
+        // ===========================
+        // LIMPAR DADOS
+        // ===========================
+
+        async function limparDados() {
+            if (!confirm('Tem certeza que deseja limpar todos os dados antigos?')) return;
+
+            try {
+                const response = await fetch(`${SERVIDOR_URL}/limpar`);
+                const data = await response.json();
+                
+                if (data.status === 'limpo') {
+                    alert('✅ Dados limpos com sucesso!');
+                    buscarUltimas();
+                }
+            } catch (error) {
+                alert('❌ Erro ao limpar dados: ' + error.message);
             }
-            return true;
         }
 
-        // ===========================
-        // INICIALIZAÇÃO
-        // ===========================
-
-        // Atualizar hora a cada segundo
-        setInterval(atualizarHora, 1000);
-        atualizarHora();
-
-        // Verificar configuração e iniciar
-        if (verificarConexao()) {
-            // Buscar imediatamente
-            buscarPrevisoes();
-            
-            // Atualizar periodicamente
-            setInterval(buscarPrevisoes, INTERVALO_ATUALIZACAO);
-        }
-
-        // Log de inicialização
-        console.log('🚍 Display BRT Recife inicializado');
+        console.log('🚍 Dashboard BRT Recife inicializado');
         console.log('📡 Servidor:', SERVIDOR_URL);
-        console.log('🚏 Parada:', PARADA_ID);
-        console.log('⏱️  Intervalo de atualização:', INTERVALO_ATUALIZACAO / 1000, 'segundos');
     </script>
 </body>
 </html>
