@@ -1,155 +1,476 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Monitor de Parada - PE</title>
-  <style>
-    /* Cores de Pernambuco */
-    :root {
-      --azul-pe: #00247d;
-      --vermelho-pe: #d80027;
-      --amarelo-pe: #ffcd00;
-      --branco: #ffffff;
-      --cinza-claro: #f5f5f5;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="10">
+    <title>BRT Recife - Próximos Ônibus</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    body {
-      font-family: 'Arial', sans-serif;
-      margin: 0;
-      padding: 0;
-      background: var(--cinza-claro);
-      color: #333;
-    }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
 
-    header {
-      background: var(--azul-pe);
-      color: var(--branco);
-      text-align: center;
-      padding: 20px 10px;
-    }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
 
-    header h1 {
-      margin: 0;
-      font-size: 2em;
-    }
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInDown 0.8s ease;
+        }
 
-    header p {
-      margin: 5px 0;
-      font-size: 1.2em;
-    }
+        h1 {
+            font-size: 3em;
+            font-weight: 700;
+            color: #FFD700;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+            margin-bottom: 10px;
+        }
 
-    main {
-      padding: 20px;
-      max-width: 800px;
-      margin: 0 auto;
-    }
+        .subtitulo {
+            font-size: 1.3em;
+            color: #fff;
+            opacity: 0.9;
+        }
 
-    h2 {
-      margin-top: 30px;
-      color: var(--azul-pe);
-    }
+        .info-bar {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 15px 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
 
-    ul.bus-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-    ul.bus-list li {
-      background: var(--branco);
-      padding: 15px 20px;
-      margin-bottom: 12px;
-      border-left: 8px solid var(--azul-pe);
-      border-radius: 5px;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
-      font-weight: bold;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+        .info-icon {
+            font-size: 1.5em;
+        }
 
-    /* Cores de status do ônibus */
-    .status-a-caminho { border-left-color: #28a745; }  /* verde */
-    .status-atrasado { border-left-color: #ffc107; }   /* amarelo */
-    .status-parado { border-left-color: #dc3545; }     /* vermelho */
-  </style>
+        #previsoes {
+            display: grid;
+            gap: 20px;
+        }
+
+        .onibus {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 25px 30px;
+            border-radius: 20px;
+            border-left: 8px solid #4CAF50;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            animation: slideIn 0.5s ease;
+        }
+
+        .onibus:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
+        }
+
+        .onibus-info {
+            flex: 1;
+        }
+
+        .linha {
+            font-size: 3em;
+            font-weight: 900;
+            color: #4CAF50;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 5px;
+        }
+
+        .nome-linha {
+            font-size: 1.2em;
+            color: #fff;
+            opacity: 0.9;
+        }
+
+        .tempo-container {
+            text-align: right;
+        }
+
+        .tempo {
+            font-size: 4em;
+            font-weight: 900;
+            color: #FFD700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            line-height: 1;
+        }
+
+        .tempo-label {
+            font-size: 1.1em;
+            color: #fff;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        .chegando {
+            border-left-color: #FF5722;
+        }
+
+        .chegando .linha {
+            color: #FF5722;
+            animation: pulse 1.5s infinite;
+        }
+
+        .chegando .tempo {
+            color: #FF5722;
+        }
+
+        .vazio {
+            text-align: center;
+            padding: 60px 30px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            font-size: 1.5em;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .vazio-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .atualizado {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.95em;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #4CAF50;
+            animation: blink 2s infinite;
+            margin-right: 8px;
+        }
+
+        .erro {
+            background: rgba(255, 87, 34, 0.2);
+            border-left-color: #FF5722;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.3em;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            border-top: 4px solid #FFD700;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.6;
+            }
+        }
+
+        @keyframes blink {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .onibus {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+
+            .tempo-container {
+                text-align: center;
+            }
+
+            .info-bar {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <header>
-    <h1 id="parada-nome">Carregando parada...</h1>
-    <p id="parada-endereco"></p>
-  </header>
-  <main>
-    <h2>Linhas que passam</h2>
-    <ul id="linhas" class="bus-list"></ul>
+    <div class="container">
+        <header>
+            <h1>🚍 Próximos Ônibus</h1>
+            <p class="subtitulo">Conde da Boa Vista - BRT Recife</p>
+        </header>
 
-    <h2>Ônibus na parada</h2>
-    <ul id="onibus" class="bus-list"></ul>
-  </main>
+        <div class="info-bar">
+            <div class="info-item">
+                <span class="info-icon">🚏</span>
+                <span>Parada B</span>
+            </div>
+            <div class="info-item">
+                <span class="status-dot"></span>
+                <span>Sistema Online</span>
+            </div>
+            <div class="info-item">
+                <span class="info-icon">⏱️</span>
+                <span id="hora-atual">--:--</span>
+            </div>
+        </div>
 
-  <script>
-    const paradas = {
-      caxanga: { nome: "TI Caxangá", endereco: "Av. Caxangá, Caxangá", linhas: ["101", "102", "103"] },
-      poeta: { nome: "BRT Engenho Poeta", endereco: "Av. Caxangá", linhas: ["201", "202"] },
-      caiara: { nome: "BRT Caiara", endereco: "Av. Caxangá", linhas: ["301", "302"] },
-      cordeiro: { nome: "BRT Parque do Cordeiro", endereco: "Av. Caxangá", linhas: ["401", "402"] },
-      getulio: { nome: "BRT Getúlio Vargas", endereco: "Av. Caxangá", linhas: ["501", "502"] },
-      derby: { nome: "BRT Derby", endereco: "Praça do Derby", linhas: ["601", "602"] },
-      hospedaria: { nome: "BRT Hospedaria", endereco: "Av. Conde da Boa Vista", linhas: ["701", "702"] },
-      "boa-vista": { nome: "BRT Shopping Boa Vista", endereco: "Av. Conde da Boa Vista", linhas: ["801", "802"] }
-    };
+        <div id="previsoes">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Carregando previsões...</p>
+            </div>
+        </div>
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const paradaID = urlParams.get('parada');
+        <div class="atualizado" id="atualizado">
+            <span class="info-icon">🔄</span>
+            Atualizado: --
+        </div>
+    </div>
 
-    if (!paradaID || !paradas[paradaID]) {
-      document.getElementById('parada-nome').textContent = "Parada não encontrada";
-    } else {
-      const parada = paradas[paradaID];
-      document.getElementById('parada-nome').textContent = parada.nome;
-      document.getElementById('parada-endereco').textContent = parada.endereco;
+    <script>
+        // ===========================
+        // CONFIGURAÇÕES
+        // ===========================
+        
+        // IMPORTANTE: Trocar pela URL do seu servidor Render!
+        const SERVIDOR_URL = 'https://esp32-camera-server-pks3.onrender.com';
+        // Exemplo: https://brt-recife-api.onrender.com
+        
+        const PARADA_ID = 'B';
+        const INTERVALO_ATUALIZACAO = 10000; // 10 segundos
 
-      // Exibe linhas
-      const linhasList = document.getElementById('linhas');
-      parada.linhas.forEach(linha => {
-        const li = document.createElement('li');
-        li.textContent = `Linha ${linha}`;
-        linhasList.appendChild(li);
-      });
+        // Nomes completos das linhas (suas linhas reais!)
+        const LINHAS_INFO = {
+            '437': 'TI Caxangá',
+            '2441': 'TI CDU',
+            '2450': 'TI Camaragibe',
+            '2444': 'TI Getúlio Vargas'
+        };
 
-      // Função para atualizar ônibus
-      function atualizarOnibus() {
-        fetch('https://seu-backend.net/upload/list')
-          .then(res => res.json())
-          .then(data => {
-            const onibusList = document.getElementById('onibus');
-            onibusList.innerHTML = "";
+        // ===========================
+        // FUNÇÕES
+        // ===========================
 
-            const onibusParada = data.filter(o => o.parada === paradaID);
-            if (onibusParada.length === 0) {
-              onibusList.innerHTML = "<li>Nenhum ônibus no momento</li>";
-            } else {
-              onibusParada.forEach(bus => {
-                const li = document.createElement('li');
-                li.textContent = `Ônibus ${bus.linha}`;
-                // Define classe de status
-                if(bus.status === "A caminho") li.classList.add('status-a-caminho');
-                else if(bus.status === "Atrasado") li.classList.add('status-atrasado');
-                else li.classList.add('status-parado');
-                onibusList.appendChild(li);
-              });
+        function atualizarHora() {
+            const agora = new Date();
+            const hora = agora.toLocaleTimeString('pt-BR', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            document.getElementById('hora-atual').textContent = hora;
+        }
+
+        async function buscarPrevisoes() {
+            try {
+                console.log('Buscando previsões...');
+                
+                const response = await fetch(`${SERVIDOR_URL}/previsoes/${PARADA_ID}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Dados recebidos:', data);
+                
+                exibirPrevisoes(data);
+                
+            } catch (error) {
+                console.error('Erro ao buscar previsões:', error);
+                exibirErro(error.message);
             }
-          })
-          .catch(err => {
-            console.error(err);
-            document.getElementById('onibus').innerHTML = "<li>Erro ao carregar ônibus</li>";
-          });
-      }
+        }
 
-      atualizarOnibus();
-      setInterval(atualizarOnibus, 10000);
-    }
-  </script>
+        function exibirPrevisoes(data) {
+            const container = document.getElementById('previsoes');
+            container.innerHTML = '';
+
+            const atualizado = document.getElementById('atualizado');
+            atualizado.innerHTML = `
+                <span class="info-icon">🔄</span>
+                Atualizado: ${data.atualizado_em || 'agora'}
+            `;
+
+            if (!data.previsoes || data.previsoes.length === 0) {
+                container.innerHTML = `
+                    <div class="vazio">
+                        <div class="vazio-icon">🚌</div>
+                        <p>Nenhum ônibus em rota no momento</p>
+                        <p style="font-size: 0.8em; margin-top: 10px; opacity: 0.6;">
+                            Aguarde as próximas detecções
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Renderizar cada previsão
+            data.previsoes.forEach((prev, index) => {
+                const div = document.createElement('div');
+                div.className = 'onibus';
+                
+                // Adicionar classe especial se está chegando
+                if (prev.minutos <= 1) {
+                    div.classList.add('chegando');
+                }
+
+                // Delay de animação para efeito cascata
+                div.style.animationDelay = `${index * 0.1}s`;
+
+                // Obter nome completo da linha
+                const nomeLinha = LINHAS_INFO[prev.linha] || prev.nome || 'Linha desconhecida';
+
+                div.innerHTML = `
+                    <div class="onibus-info">
+                        <div class="linha">${prev.linha}</div>
+                        <div class="nome-linha">${nomeLinha}</div>
+                    </div>
+                    <div class="tempo-container">
+                        <div class="tempo">${prev.minutos}</div>
+                        <div class="tempo-label">
+                            ${prev.minutos === 1 ? 'minuto' : 'minutos'}
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(div);
+            });
+        }
+
+        function exibirErro(mensagem) {
+            const container = document.getElementById('previsoes');
+            container.innerHTML = `
+                <div class="erro">
+                    <div style="font-size: 3em; margin-bottom: 15px;">⚠️</div>
+                    <h3 style="margin-bottom: 10px;">Erro ao conectar com servidor</h3>
+                    <p style="opacity: 0.8;">${mensagem}</p>
+                    <p style="font-size: 0.9em; margin-top: 15px; opacity: 0.6;">
+                        Tentando reconectar automaticamente...
+                    </p>
+                </div>
+            `;
+        }
+
+        function verificarConexao() {
+            if (SERVIDOR_URL.includes('SEU-APP')) {
+                const container = document.getElementById('previsoes');
+                container.innerHTML = `
+                    <div class="erro">
+                        <div style="font-size: 3em; margin-bottom: 15px;">⚙️</div>
+                        <h3 style="margin-bottom: 10px;">Configuração Necessária</h3>
+                        <p style="opacity: 0.8;">
+                            Por favor, atualize a variável <code style="background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 4px;">SERVIDOR_URL</code> 
+                            no código HTML com a URL do seu servidor Render.
+                        </p>
+                        <p style="font-size: 0.9em; margin-top: 15px; opacity: 0.6;">
+                            Exemplo: https://brt-recife-api.onrender.com
+                        </p>
+                    </div>
+                `;
+                return false;
+            }
+            return true;
+        }
+
+        // ===========================
+        // INICIALIZAÇÃO
+        // ===========================
+
+        // Atualizar hora a cada segundo
+        setInterval(atualizarHora, 1000);
+        atualizarHora();
+
+        // Verificar configuração e iniciar
+        if (verificarConexao()) {
+            // Buscar imediatamente
+            buscarPrevisoes();
+            
+            // Atualizar periodicamente
+            setInterval(buscarPrevisoes, INTERVALO_ATUALIZACAO);
+        }
+
+        // Log de inicialização
+        console.log('🚍 Display BRT Recife inicializado');
+        console.log('📡 Servidor:', SERVIDOR_URL);
+        console.log('🚏 Parada:', PARADA_ID);
+        console.log('⏱️  Intervalo de atualização:', INTERVALO_ATUALIZACAO / 1000, 'segundos');
+    </script>
 </body>
 </html>
