@@ -183,15 +183,6 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-
-        .debug {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 15px;
-            margin-top: 20px;
-            border-radius: 8px;
-            font-size: 0.9em;
-            font-family: monospace;
-        }
     </style>
 </head>
 <body>
@@ -219,58 +210,49 @@
         Última atualização: --
     </div>
 
-    <div class="debug" id="debug" style="display: none;">
-        <div>URL da API: <span id="debugUrl"></span></div>
-        <div>Parada: <span id="debugParada"></span></div>
-        <div>Status: <span id="debugStatus"></span></div>
-        <div>Total de dados: <span id="debugTotal"></span></div>
-    </div>
-
     <script>
         const API = 'https://brt-webcam-server.onrender.com';
         
+        // Nomes das paradas
         const paradaNomes = {
-            'caxanga': 'Caxangá',
-            'poeta': 'Poeta',
-            'caiara': 'Caiará',
-            'cordeiro': 'Cordeiro',
+            'poeta': 'Engenho Poeta',
             'getulio': 'Getúlio Vargas',
+            'cordeiro': 'Cordeiro',
+            'madalena': 'Madalena',
             'derby': 'Derby',
-            'hospedaria': 'Hospedaria',
-            'boa-vista': 'Boa Vista'
+            'boa-vista': 'Boa Vista',
+            'diario': 'Praça do Diário'
         };
 
-        // Nomes reais das linhas BRT
+        // Nomes das linhas
         const nomesLinhas = {
-            '262940': 'Linha 262940 - Terminal Integrado',
-            '437': 'Linha 437 - TI Caxangá',
-            '2441': 'Linha 2441 - TI CDU',
-            '2450': 'Linha 2450 - TI Camaragibe',
-            '2444': 'Linha 2444 - TI Getúlio Vargas'
+            '262940': 'Terminal Integrado',
+            '437': 'TI Caxangá',
+            '2441': 'TI CDU',
+            '2450': 'TI Camaragibe',
+            '2444': 'TI Getúlio Vargas'
         };
 
-        // Distâncias aproximadas entre paradas (em minutos de diferença)
-        const distanciasParadas = {
-            'caxanga': 0,      // Origem
-            'poeta': 3,        // +3 min de Caxangá
-            'caiara': 6,       // +6 min de Caxangá
-            'cordeiro': 9,     // +9 min
-            'getulio': 12,     // +12 min
-            'derby': 15,       // +15 min
-            'hospedaria': 18,  // +18 min
-            'boa-vista': 21    // +21 min (final)
+        // Ordem das paradas (sequencial)
+        const ordemParadas = ['poeta', 'getulio', 'cordeiro', 'madalena', 'derby', 'boa-vista', 'diario'];
+
+        // Tempo entre paradas (em minutos) - baseado nas distâncias reais
+        // Considerando velocidade média de 30 km/h
+        const temposEntreParadas = {
+            'poeta-getulio': 2,      // ~1.2 km = 2 min
+            'getulio-cordeiro': 1,   // ~550 m = 1 min
+            'cordeiro-madalena': 1,  // ~500 m = 1 min
+            'madalena-derby': 2,     // ~1.0 km = 2 min
+            'derby-boa-vista': 2,    // ~900 m = 2 min
+            'boa-vista-diario': 1    // ~280 m = 1 min
         };
 
         // Pegar parâmetro da URL
         const params = new URLSearchParams(window.location.search);
-        const paradaAtual = params.get('parada') || 'boa-vista';
+        const paradaAtual = params.get('parada') || 'poeta';
         
         // Mostrar nome da parada
         document.getElementById('paradaNome').textContent = paradaNomes[paradaAtual] || 'BRT Recife';
-        
-        // Debug info
-        document.getElementById('debugUrl').textContent = API;
-        document.getElementById('debugParada').textContent = paradaAtual;
 
         function atualizarRelogio() {
             const d = new Date();
@@ -279,13 +261,35 @@
             document.getElementById('relogio').textContent = h + ':' + m;
         }
 
+        function calcularTempoParaParada(paradaOrigem, paradaDestino) {
+            // Se é a mesma parada, retorna 0 (já passou ou está chegando)
+            if (paradaOrigem === paradaDestino) {
+                return 0;
+            }
+
+            const idxOrigem = ordemParadas.indexOf(paradaOrigem);
+            const idxDestino = ordemParadas.indexOf(paradaDestino);
+
+            // Se a origem está depois do destino, ônibus já passou
+            if (idxOrigem >= idxDestino) {
+                return -1;
+            }
+
+            // Calcular tempo acumulado
+            let tempoTotal = 0;
+            for (let i = idxOrigem; i < idxDestino; i++) {
+                const chave = ordemParadas[i] + '-' + ordemParadas[i + 1];
+                tempoTotal += temposEntreParadas[chave] || 2;
+            }
+
+            return tempoTotal;
+        }
+
         async function buscarOnibus() {
             const statusDot = document.getElementById('statusDot');
             const statusTexto = document.getElementById('statusTexto');
             
             try {
-                console.log('Buscando de:', API + '/ultimos');
-                
                 const resp = await fetch(API + '/ultimos', {
                     method: 'GET',
                     headers: {
@@ -293,17 +297,11 @@
                     }
                 });
                 
-                console.log('Status da resposta:', resp.status);
-                
                 if (!resp.ok) {
                     throw new Error('Servidor retornou ' + resp.status);
                 }
                 
                 const dados = await resp.json();
-                console.log('Dados recebidos:', dados);
-                
-                document.getElementById('debugStatus').textContent = 'OK';
-                document.getElementById('debugTotal').textContent = dados.length;
                 
                 statusDot.classList.remove('offline');
                 statusTexto.textContent = 'Sistema Ativo';
@@ -317,8 +315,6 @@
             } catch (erro) {
                 console.error('Erro completo:', erro);
                 
-                document.getElementById('debugStatus').textContent = 'ERRO: ' + erro.message;
-                
                 statusDot.classList.add('offline');
                 statusTexto.textContent = 'Servidor Offline';
                 
@@ -328,8 +324,6 @@
 
         function mostrarOnibus(dados) {
             const lista = document.getElementById('listaOnibus');
-            
-            console.log('Total de registros:', dados.length);
             
             if (!dados || dados.length === 0) {
                 lista.innerHTML = `
@@ -349,14 +343,67 @@
                 return temLinha && temPrevisao;
             });
 
-            console.log('Registros válidos:', validos.length);
-
             if (validos.length === 0) {
                 lista.innerHTML = `
                     <div class="sem-onibus">
                         <div class="icone-vazio">🚌</div>
                         <div class="texto-vazio">Sem ônibus válidos</div>
-                        <div class="subtexto-vazio">Dados recebidos mas sem detecções válidas</div>
+                        <div class="subtexto-vazio">Aguardando próximos ônibus</div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Processar cada ônibus
+            const onibusFiltrados = [];
+
+            validos.forEach(item => {
+                const linha = item.linha_detectada;
+                const timestamp = new Date(item.timestamp);
+                
+                // Assumir que o ônibus foi detectado na primeira parada (Poeta)
+                // ou pegar de algum campo se você tiver essa informação
+                const paradaDeteccao = 'poeta'; // Pode vir do banco de dados
+                
+                // Calcular quanto tempo faz desde a detecção
+                const agora = new Date();
+                const minutosDecorridos = Math.floor((agora - timestamp) / 60000);
+                
+                // Calcular tempo base da previsão original
+                const tempoBaseOriginal = item.previsao.chega_em_min;
+                
+                // Calcular tempo para a parada atual
+                const tempoEntreParadas = calcularTempoParaParada(paradaDeteccao, paradaAtual);
+                
+                // Se retornou -1, ônibus já passou desta parada
+                if (tempoEntreParadas === -1) {
+                    return; // Não mostrar
+                }
+                
+                // Tempo ajustado = tempo base + tempo entre paradas - minutos já decorridos
+                const tempoAjustado = Math.max(0, tempoBaseOriginal + tempoEntreParadas - minutosDecorridos);
+                
+                // Se tempo é 0, ônibus está chegando agora ou já passou
+                if (tempoAjustado === 0) {
+                    return; // Não mostrar (já passou)
+                }
+                
+                onibusFiltrados.push({
+                    linha: linha,
+                    tempo: tempoAjustado,
+                    timestamp: timestamp
+                });
+            });
+
+            // Ordenar por tempo
+            onibusFiltrados.sort((a, b) => a.tempo - b.tempo);
+
+            if (onibusFiltrados.length === 0) {
+                lista.innerHTML = `
+                    <div class="sem-onibus">
+                        <div class="icone-vazio">🚌</div>
+                        <div class="texto-vazio">Nenhum ônibus próximo</div>
+                        <div class="subtexto-vazio">Ônibus detectados já passaram por esta parada</div>
                     </div>
                 `;
                 return;
@@ -364,34 +411,24 @@
 
             lista.innerHTML = '';
             
-            // Pegar os 5 mais recentes
-            const recentes = validos.slice(0, 5);
+            // Mostrar até 5 ônibus
+            const exibir = onibusFiltrados.slice(0, 5);
             
-            recentes.forEach(item => {
-                const tempoBase = item.previsao.chega_em_min;
-                const linha = item.linha_detectada;
-                
-                // Calcular tempo ajustado baseado na parada atual
-                const ajusteDistancia = distanciasParadas[paradaAtual] || 0;
-                const tempoAjustado = Math.max(1, tempoBase + ajusteDistancia);
-                
-                // Pegar nome completo da linha
-                const nomeLinha = nomesLinhas[linha] || `Linha ${linha}`;
-                
-                console.log('Exibindo:', linha, tempoAjustado, 'min (base:', tempoBase, '+ ajuste:', ajusteDistancia, ')');
+            exibir.forEach(onibus => {
+                const nomeLinha = nomesLinhas[onibus.linha] || `Linha ${onibus.linha}`;
                 
                 const div = document.createElement('div');
                 div.className = 'card-onibus';
-                if (tempoAjustado <= 2) div.className += ' urgente';
+                if (onibus.tempo <= 2) div.className += ' urgente';
                 
                 div.innerHTML = `
                     <div class="lado-esquerdo">
-                        <div class="numero-linha">${linha}</div>
+                        <div class="numero-linha">${onibus.linha}</div>
                         <div class="nome-destino">${nomeLinha}</div>
                     </div>
                     <div class="lado-direito">
-                        <div class="numero-tempo">${tempoAjustado}</div>
-                        <div class="texto-minutos">${tempoAjustado === 1 ? 'MIN' : 'MINUTOS'}</div>
+                        <div class="numero-tempo">${onibus.tempo}</div>
+                        <div class="texto-minutos">${onibus.tempo === 1 ? 'MINUTO' : 'MINUTOS'}</div>
                     </div>
                 `;
                 
@@ -414,26 +451,12 @@
             `;
         }
 
-        // Mostrar debug no console
-        console.log('=== BRT RECIFE DEBUG ===');
-        console.log('API:', API);
-        console.log('Parada:', paradaAtual);
-        console.log('Nome da Parada:', paradaNomes[paradaAtual]);
-        
         // Iniciar
         setInterval(atualizarRelogio, 1000);
         atualizarRelogio();
 
         buscarOnibus();
         setInterval(buscarOnibus, 15000);
-        
-        // Ativar debug com CTRL+D
-        document.addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.key === 'd') {
-                const debug = document.getElementById('debug');
-                debug.style.display = debug.style.display === 'none' ? 'block' : 'none';
-            }
-        });
     </script>
 </body>
 </html>
