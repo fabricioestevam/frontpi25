@@ -1,39 +1,38 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Previsão BRT Recife</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="15">
+    <title>BRT Recife</title>
 
-    <!-- Arquivo CSS separado -->
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-    <header class="header">
-        <h1>Sistema de Previsão BRT</h1>
-    </header>
+<div class="topo">
+    <div class="titulo-principal">PRÓXIMOS ÔNIBUS</div>
 
-    <main class="container">
-        <div class="card">
-            <h2 class="linha" id="linha"></h2>
-            <p class="parada">Parada: <span id="parada"></span></p>
-
-            <div class="dados">
-                <p class="chegada">Chega em: <span id="minutos"></span> min</p>
-                <p class="hora">Horário Previsto: <span id="horario"></span></p>
-            </div>
-
-            <p class="status" id="status"></p>
+    <div class="barra-info">
+        <div class="item-info">
+            <span class="ponto-status" id="statusDot"></span>
+            <span id="statusTexto">Verificando...</span>
         </div>
-    </main>
 
-    <footer class="footer">
-        <p>Monitor BRT Recife</p>
-    </footer>
+        <div class="item-info" id="paradaNome">Carregando...</div>
+        <div class="item-info relogio" id="relogio">--:--</div>
+    </div>
+</div>
 
-    <!-- Seu JS -->
-    <script src="script.js"></script>
+<div class="lista-onibus" id="listaOnibus">
+    <div class="carregando">
+        <div class="spinner-load"></div>
+        <div>Carregando...</div>
+    </div>
+</div>
+
+<div class="rodape" id="rodape">Última atualização: --</div>
+
+<script src="script.js"></script>
 </body>
 </html>
