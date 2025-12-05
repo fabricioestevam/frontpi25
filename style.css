@@ -1,0 +1,78 @@
+/* ======================= */
+/*       ESTILOS GERAIS    */
+/* ======================= */
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background: #f0f2f5;
+    color: #333;
+}
+
+/* HEADER */
+.header {
+    background: #0057b7;
+    padding: 15px;
+    text-align: center;
+    color: white;
+    font-size: 1.4rem;
+    font-weight: bold;
+}
+
+/* LAYOUT */
+.container {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    width: 320px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+/* TIPOGRAFIA */
+.linha {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #0057b7;
+    margin-bottom: 10px;
+}
+
+.parada {
+    font-size: 1.1rem;
+    margin-bottom: 25px;
+}
+
+.dados {
+    margin-bottom: 20px;
+}
+
+.chegada {
+    font-size: 1.4rem;
+    font-weight: bold;
+}
+
+.hora {
+    font-size: 1.1rem;
+    margin-top: 10px;
+}
+
+.status {
+    margin-top: 20px;
+    font-weight: bold;
+    color: #444;
+}
+
+/* FOOTER */
+.footer {
+    text-align: center;
+    margin-top: 50px;
+    padding: 10px;
+    color: #777;
+}
