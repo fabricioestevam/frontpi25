@@ -361,9 +361,8 @@
                 const linha = item.linha_detectada;
                 const timestamp = new Date(item.timestamp);
                 
-                // Assumir que o ônibus foi detectado na primeira parada (Poeta)
-                // ou pegar de algum campo se você tiver essa informação
-                const paradaDeteccao = 'poeta'; // Pode vir do banco de dados
+                // Pegar parada onde o ônibus foi detectado
+                const paradaDeteccao = item.parada_origem || 'poeta';
                 
                 // Calcular quanto tempo faz desde a detecção
                 const agora = new Date();
