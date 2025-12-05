@@ -240,12 +240,25 @@
             'boa-vista': 'Boa Vista'
         };
 
-        const destinos = {
-            '262940': 'Terminal Integrado',
-            '437': 'TI Caxangá',
-            '2441': 'TI CDU',
-            '2450': 'TI Camaragibe',
-            '2444': 'TI Getúlio Vargas'
+        // Nomes reais das linhas BRT
+        const nomesLinhas = {
+            '262940': 'Linha 262940 - Terminal Integrado',
+            '437': 'Linha 437 - TI Caxangá',
+            '2441': 'Linha 2441 - TI CDU',
+            '2450': 'Linha 2450 - TI Camaragibe',
+            '2444': 'Linha 2444 - TI Getúlio Vargas'
+        };
+
+        // Distâncias aproximadas entre paradas (em minutos de diferença)
+        const distanciasParadas = {
+            'caxanga': 0,      // Origem
+            'poeta': 3,        // +3 min de Caxangá
+            'caiara': 6,       // +6 min de Caxangá
+            'cordeiro': 9,     // +9 min
+            'getulio': 12,     // +12 min
+            'derby': 15,       // +15 min
+            'hospedaria': 18,  // +18 min
+            'boa-vista': 21    // +21 min (final)
         };
 
         // Pegar parâmetro da URL
@@ -355,24 +368,30 @@
             const recentes = validos.slice(0, 5);
             
             recentes.forEach(item => {
-                const min = item.previsao.chega_em_min;
+                const tempoBase = item.previsao.chega_em_min;
                 const linha = item.linha_detectada;
-                const dest = destinos[linha] || 'Terminal Integrado';
                 
-                console.log('Exibindo:', linha, min, 'min');
+                // Calcular tempo ajustado baseado na parada atual
+                const ajusteDistancia = distanciasParadas[paradaAtual] || 0;
+                const tempoAjustado = Math.max(1, tempoBase + ajusteDistancia);
+                
+                // Pegar nome completo da linha
+                const nomeLinha = nomesLinhas[linha] || `Linha ${linha}`;
+                
+                console.log('Exibindo:', linha, tempoAjustado, 'min (base:', tempoBase, '+ ajuste:', ajusteDistancia, ')');
                 
                 const div = document.createElement('div');
                 div.className = 'card-onibus';
-                if (min <= 2) div.className += ' urgente';
+                if (tempoAjustado <= 2) div.className += ' urgente';
                 
                 div.innerHTML = `
                     <div class="lado-esquerdo">
                         <div class="numero-linha">${linha}</div>
-                        <div class="nome-destino">${dest}</div>
+                        <div class="nome-destino">${nomeLinha}</div>
                     </div>
                     <div class="lado-direito">
-                        <div class="numero-tempo">${min}</div>
-                        <div class="texto-minutos">${min === 1 ? 'MIN' : 'MINUTOS'}</div>
+                        <div class="numero-tempo">${tempoAjustado}</div>
+                        <div class="texto-minutos">${tempoAjustado === 1 ? 'MIN' : 'MINUTOS'}</div>
                     </div>
                 `;
                 
