@@ -1,9 +1,3 @@
-Aqui está **um README simples, direto, e perfeito para o seu front atual**, **sem alterar nada do HTML/CSS**, apenas documentando como ele funciona e como ele se conecta com o backend.
-
-Se quiser, depois faço a versão “bonita” com badges, imagens, diagrama, etc.
-
----
-
 # **README – Sistema de Monitoramento BRT (Front-End)**
 
 ## 📌 **Descrição do Projeto**
